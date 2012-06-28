@@ -208,4 +208,4 @@ class imagePreProcessor(QtGui.QWidget):
 
 
 if __name__ == "__main__":
-    print "Hello World"
+    print "nothing to do here for now"
