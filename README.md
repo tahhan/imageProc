@@ -10,9 +10,9 @@ A simple Image Processing program with GUI using Python and PyQt4
 
 - Slide Histogram
 	
-	-left
+	- left
 
-	-right
+	- right
 
 - Histogram Equalization
 
@@ -22,9 +22,9 @@ A simple Image Processing program with GUI using Python and PyQt4
 
 ###Local (Mask) Operations
 
-- Mean Local filtering
+- Mean Local Filtering
 
-- MedianLocal filtering
+- Median Local Filtering
 
 ###Segmentation
 
@@ -33,11 +33,11 @@ A simple Image Processing program with GUI using Python and PyQt4
 ##next step
 ###Project milestones
 
-- colored images.
+- Colored Images.
 
-- add more image processing operations.
+- Add more image processing operations.
 
-- frequency domain operations.
+- Frequency Domain Operations.
 
 ###Code Enhancements
 
