@@ -41,19 +41,18 @@ class imagePreProcessor(QtGui.QWidget):
         self.repaint()
 
     def findHistogram(self):
-        #pixeling : the only purpose of this it to reduce the over head of im.getpixel()
-        self.pixels = list(self.img.getdata())
         width, height = self.img.size
-        self.pixels = [self.pixels[i * width:(i + 1) * width] for i in xrange(height)]
-        #end pixeling
 
-        self.histo = []
-        for i in range(256):
-            self.histo.append(0)
+        #pixeling : the only purpose of this it to reduce the over head of im.getpixel()
+        self.pixels = self.img.load()
 
-        for i in range(height):
-            for j in range(width):
-                self.histo[self.pixels[i][j]] = self.histo[self.pixels[i][j]]+1
+        #initialize histogram with zeros
+        self.histo = [0 for x in range(256)]
+
+        #now fill it
+        for i in range(width):
+            for j in range(height):
+                self.histo[self.pixels[i,j]] = self.histo[self.pixels[i,j]]+1
 
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
@@ -91,7 +90,7 @@ class imagePreProcessor(QtGui.QWidget):
         width, height = self.img.size
         for i in range(width):
             for j in range(height):
-                self.img.putpixel((i, j), ( (maxR - minR)/float(max - min) )* (self.img.getpixel((i,j)) - min) )
+                self.img.putpixel((i, j), ( (maxR - minR)/float(max - min) )* (self.pixels[i,j] - min) )
 
         self.loadImageFromPIX(self.img)
 
@@ -99,7 +98,7 @@ class imagePreProcessor(QtGui.QWidget):
         width, height = self.img.size
         for i in range(width):
             for j in range(height):
-                self.img.putpixel( (i, j), self.img.getpixel( (i,j) ) - amount )
+                self.img.putpixel( (i, j), self.pixels[i,j] - amount )
 
         self.loadImageFromPIX(self.img)
 
@@ -107,7 +106,7 @@ class imagePreProcessor(QtGui.QWidget):
         width, height = self.img.size
         for i in range(width):
             for j in range(height):
-                self.img.putpixel( (i, j), self.img.getpixel( (i,j) ) + amount )
+                self.img.putpixel( (i, j), self.pixels[i,j] + amount )
 
         self.loadImageFromPIX(self.img)
 
@@ -115,7 +114,7 @@ class imagePreProcessor(QtGui.QWidget):
         width, height = self.img.size
         for i in range(width):
             for j in range(height):
-                self.img.putpixel((i, j), 255 - self.img.getpixel((i,j))  )
+                self.img.putpixel((i, j), 255 - self.pixels[i,j]  )
 
         self.loadImageFromPIX(self.img)
 
@@ -134,7 +133,7 @@ class imagePreProcessor(QtGui.QWidget):
         width, height = self.img.size
         for i in range(width):
             for j in range(height):
-                self.img.putpixel((i, j), self.histo[self.img.getpixel((i,j))]  )
+                self.img.putpixel((i, j), self.histo[ self.pixels[i,j] ]  )
 
         self.loadImageFromPIX(self.img)
 
@@ -143,15 +142,15 @@ class imagePreProcessor(QtGui.QWidget):
         for i in range(1, width-1):
             for j in range(1, height-1):
                 result = (
-                self.img.getpixel( ( (i - 1), j-1) ) +
-                self.img.getpixel( ( (i - 1), j ) ) +
-                self.img.getpixel( ( (i - 1), j+1 ) ) +
-                self.img.getpixel( ( i, j-1 ) ) +
-                self.img.getpixel( ( i, j ) ) +
-                self.img.getpixel( ( i, j+1 ) ) +
-                self.img.getpixel( ( (i+1), j-1 ) ) +
-                self.img.getpixel( ( (i+1), j ) ) +
-                self.img.getpixel( ( (i+1), j+1 ) ) ) / 9
+                self.pixels[ (i - 1), j-1] +
+                self.pixels[ (i - 1), j ] +
+                self.pixels[ (i - 1), j+1 ] +
+                self.pixels[ i, j-1 ] +
+                self.pixels[ i, j ] +
+                self.pixels[ i, j+1 ] +
+                self.pixels[ (i+1), j-1 ] +
+                self.pixels[ (i+1), j ] +
+                self.pixels[ (i+1), j+1 ] ) / 9
 
                 self.img.putpixel( (i, j), result )
 
@@ -165,17 +164,17 @@ class imagePreProcessor(QtGui.QWidget):
              window = []
              for j in range(m-1, m+2):
                 for i in range(n-1, n+2):
-                   window.append( self.img.getpixel((j , i)) )
+                   window.append( self.pixels[j , i] )
              # Order elements (only half of them)
-             for j in range(0, 5):
+             for x in range(0, 5):
                 # Find position of minimum element
-                min = j
-                for l in range(j + 1, 9):
+                min = x
+                for l in range(x + 1, 9):
                     if window[l] < window[min]:
                        min = l
                 #Put found minimum element in its place
-                temp = window[j];
-                window[j] = window[min]
+                temp = window[x];
+                window[x] = window[min]
                 window[min] = temp
              #   Get result - the middle element
              self.img.putpixel( ( (m-1) , n-1), window[4])
@@ -188,14 +187,14 @@ class imagePreProcessor(QtGui.QWidget):
         for i in range(1, width-1):
             for j in range(1, height-1):
                 # getting gray value of all surrounding pixels
-                pixel_up = self.img.getpixel((i,j-1))
-                pixel_down = self.img.getpixel((i,j+1))
-                pixel_left = self.img.getpixel((i-1,j))
-                pixel_right = self.img.getpixel((i+1,j))
-                pixel_up_left = self.img.getpixel((i-1,j-1))
-                pixel_up_right = self.img.getpixel((i+1,j-1))
-                pixel_down_left = self.img.getpixel((i-1,j+1))
-                pixel_down_right = self.img.getpixel((i+1,j+1))
+                pixel_up = self.pixels[i,j-1]
+                pixel_down = self.pixels[i,j+1]
+                pixel_left = self.pixels[i-1,j]
+                pixel_right = self.pixels[i+1,j]
+                pixel_up_left = self.pixels[i-1,j-1]
+                pixel_up_right = self.pixels[i+1,j-1]
+                pixel_down_left = self.pixels[i-1,j+1]
+                pixel_down_right = self.pixels[i+1,j+1]
                 # appliying convolution mask
                 conv_x = (pixel_up_right+(pixel_right*2)+pixel_down_right)-(pixel_up_left+(pixel_left*2)+pixel_down_left)
                 conv_y = (pixel_up_left+(pixel_up*2)+pixel_up_right)-(pixel_down_left+(pixel_down*2)+pixel_down_right)
@@ -205,7 +204,6 @@ class imagePreProcessor(QtGui.QWidget):
                 newImg.putpixel((i,j), gray)
 
         self.loadImageFromPIX(newImg)
-
 
 if __name__ == "__main__":
     print "nothing to do here for now"

@@ -9,8 +9,6 @@ import sys
 from chart import chart
 from imagePreProcessor import imagePreProcessor
 
-
-
 class MainWindow(QtGui.QMainWindow):
     """" main window class"""
 
@@ -62,7 +60,7 @@ class MainWindow(QtGui.QMainWindow):
 
         btnEdgeDetection = QtGui.QPushButton('Edge Detection', self.rightbottom)
         btnEdgeDetection.clicked.connect(self.edgeDetection)
-        grid.addWidget(btnEdgeDetection, 8,0)
+        grid.addWidget(btnEdgeDetection, 9,0)
 
         #btnRest = QtGui.QPushButton('Rest', self.rightbottom)
         #grid.addWidget(btnRest, 9,0)

@@ -42,6 +42,5 @@ class chart(QtGui.QWidget):
                 x += delta
             painter.end()
 
-
 if __name__ == "__main__":
     print "nothing to do here for now"
