@@ -44,3 +44,18 @@ A simple Image Processing program with GUI using Python and PyQt4
 - all classes are reusable.
 
 - performance tuning.
+
+##Building imageProc
+###dependencies
+
+- Python 2.6.6
+
+- sip 4.13.2
+
+- PyQt 4.9.1
+
+###[SIP](http://www.riverbankcomputing.co.uk/software/sip/download/)
+> SIP is a tool that makes it very easy to create Python bindings for C and C++ libraries. It was originally developed to create PyQt, the Python bindings for the Qt toolkit, but can be used to create bindings for any C or C++ library.
+
+###[PyQt](http://www.riverbankcomputing.co.uk/software/pyqt/download/)
+> PyQt is a set of Python bindings for Nokia's Qt application framework and runs on all platforms supported by Qt including Windows, MacOS/X and Linux.
