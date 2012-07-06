@@ -1,6 +1,5 @@
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
-
+#!/usr/bin/python
+""" A PyQt widget to Draw chart by giving it a list of the data needed to be 'charted' """
 __author__="tahhan"
 __date__ ="$Jun 28, 2012 12:55:48 AM$"
 
@@ -41,6 +40,3 @@ class chart(QtGui.QWidget):
                 #painter.drawText(x-8, y2-15, s)
                 x += delta
             painter.end()
-
-if __name__ == "__main__":
-    print "nothing to do here for now"

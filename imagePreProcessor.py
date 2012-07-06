@@ -1,10 +1,10 @@
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
-
+#!/usr/bin/python
+""" this class deal with image procssing """
 __author__="tahhan"
 __date__ ="$Jun 28, 2012 1:01:29 AM$"
 
 from PyQt4 import QtGui, QtCore
+
 import os, Image, random, math
 
 HISTOGRAM_THRESHOLD = 50
@@ -110,14 +110,6 @@ class imagePreProcessor(QtGui.QWidget):
 
         self.loadImageFromPIX(self.img)
 
-    def negative(self):
-        width, height = self.img.size
-        for i in range(width):
-            for j in range(height):
-                self.img.putpixel((i, j), 255 - self.pixels[i,j]  )
-
-        self.loadImageFromPIX(self.img)
-
     def histogramEqualization(self):
         runningSum = []
         dummyNumber = 0
@@ -134,6 +126,14 @@ class imagePreProcessor(QtGui.QWidget):
         for i in range(width):
             for j in range(height):
                 self.img.putpixel((i, j), self.histo[ self.pixels[i,j] ]  )
+
+        self.loadImageFromPIX(self.img)
+
+    def negative(self):
+        width, height = self.img.size
+        for i in range(width):
+            for j in range(height):
+                self.img.putpixel((i, j), 255 - self.pixels[i,j]  )
 
         self.loadImageFromPIX(self.img)
 
@@ -195,15 +195,14 @@ class imagePreProcessor(QtGui.QWidget):
                 pixel_up_right = self.pixels[i+1,j-1]
                 pixel_down_left = self.pixels[i-1,j+1]
                 pixel_down_right = self.pixels[i+1,j+1]
+
                 # appliying convolution mask
                 conv_x = (pixel_up_right+(pixel_right*2)+pixel_down_right)-(pixel_up_left+(pixel_left*2)+pixel_down_left)
                 conv_y = (pixel_up_left+(pixel_up*2)+pixel_up_right)-(pixel_down_left+(pixel_down*2)+pixel_down_right)
+
                 # calculating the distance
                 #gray = math.sqrt( (conv_x*conv_x+conv_y+conv_y) )
                 gray = math.fabs(conv_x)+math.fabs(conv_y);
                 newImg.putpixel((i,j), gray)
 
         self.loadImageFromPIX(newImg)
-
-if __name__ == "__main__":
-    print "nothing to do here for now"
