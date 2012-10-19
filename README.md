@@ -45,6 +45,8 @@ A simple Image Processing program with GUI using Python and PyQt4
 
 - performance tuning.
 
+basically implementing most of [Image Processing Operator Worksheets](http://homepages.inf.ed.ac.uk/rbf/HIPR2/wksheets.htm)
+
 ##Building imageProc
 ###dependencies
 
