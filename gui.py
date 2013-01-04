@@ -13,6 +13,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.imgPreProc = imagePreProcessor()
         self.initUI()
 
     def initUI(self):
@@ -91,7 +92,7 @@ class MainWindow(QtGui.QMainWindow):
         #hide it, its empty
         self.rightbottom.hide()
 
-        self.imgPreProc = imagePreProcessor()
+        self.imageWidget = imageWidget()
         #self.imgPreProc.setFixedSize(800,650)
 
         self.histoChart = chart()
@@ -102,7 +103,7 @@ class MainWindow(QtGui.QMainWindow):
         splitter1.addWidget(self.rightbottom)
 
         splitter2 = QtGui.QSplitter(QtCore.Qt.Horizontal)
-        splitter2.addWidget(self.imgPreProc)
+        splitter2.addWidget(self.imageWidget)
         splitter2.addWidget(splitter1)
 
         hbox.addWidget(splitter2)
@@ -129,7 +130,20 @@ class MainWindow(QtGui.QMainWindow):
         mainWidget.setLayout(hbox)
         #end new stuff
         """
+
         self.setCentralWidget(mainWidget)
+
+        #a try of making a status bar
+        statusBar = QtGui.QStatusBar()
+        statusBar.setFixedHeight(18)
+        self.setStatusBar(statusBar)
+        self.statusBar().showMessage(self.tr("Ready"))
+
+        self.progressBar = QtGui.QProgressBar(self.statusBar())
+        self.progressBar.setMaximum(0)
+        self.progressBar.setMinimum(100)
+        self.statusBar().addPermanentWidget(self.progressBar)
+        
 
         self.setupMenu()
 
@@ -154,15 +168,23 @@ class MainWindow(QtGui.QMainWindow):
 
     def open(self, filepath):
 		self.imgPreProc.loadImage(str(filepath))
-		self.rebuildHisto()
+		self.refreshAll()
 		self.rightbottom.show()
 
+    def repaintImage(self):
+        self.imageWidget.Qimg = self.imgPreProc.Qimg
+        self.imageWidget.repaint()
+        
     def rebuildHisto(self):
 		self.histoChart.setData(self.imgPreProc.histo)
 
+    def refreshAll(self):
+        self.rebuildHisto()
+        self.repaintImage()
+        
     def stretchHisto(self):
 		self.imgPreProc.stretchHisto()
-		self.rebuildHisto()
+		self.refreshAll()
 
     def shrinkHisto(self):
         if self.minREdit.text().isEmpty():
@@ -174,7 +196,7 @@ class MainWindow(QtGui.QMainWindow):
             else :
                 maxR = int(self.maxREdit.text())
                 self.imgPreProc.shrinkHisto(minR, maxR)
-                self.rebuildHisto()
+                self.refreshAll()
 
     def slidesLeftHisto(self):
         if self.slidesLeftEdit.text().isEmpty():
@@ -182,32 +204,43 @@ class MainWindow(QtGui.QMainWindow):
         else :
             amount  = int(self.slidesLeftEdit.text())
             self.imgPreProc.slidesLeftHisto(amount)
-            self.rebuildHisto()
+            self.refreshAll()
 
     def slidesRightHisto(self):
         if self.slidesRightEdit.text().isEmpty():
             QtGui.QMessageBox.critical(self, "Error", "You have to fill the By")
         else :
-            amount  = int(self.slidesRightEdit.text())
+            amount = int(self.slidesRightEdit.text())
             self.imgPreProc.slidesRightHisto(amount)
-            self.rebuildHisto()
+            self.refreshAll()
 
     def histogramEqualization(self):
         self.imgPreProc.histogramEqualization()
-        self.rebuildHisto()
+        self.refreshAll()
 
     def negative(self):
         self.imgPreProc.negative()
-        self.rebuildHisto()
+        self.refreshAll()
         
     def meanFilter(self):
         self.imgPreProc.meanFilter()
-        self.rebuildHisto()
+        self.refreshAll()
 
     def medianFilter(self):
         self.imgPreProc.medianFilter()
-        self.rebuildHisto()
+        self.refreshAll()
 
     def edgeDetection(self):
         self.imgPreProc.edgeDetection()
-        self.rebuildHisto()
+        self.refreshAll()
+
+class imageWidget(QtGui.QWidget):
+    def __init__(self):
+        super(imageWidget, self).__init__()
+        self.Qimg = None
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        if self.Qimg :
+            painter.drawImage(event.rect(), self.Qimg, event.rect())
+        painter.end()

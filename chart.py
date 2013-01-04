@@ -16,7 +16,7 @@ class chart(QtGui.QWidget):
         self.repaint()
 
     def paintEvent(self, event):
-        if self.chartData :
+        if len(self.chartData) :
             painter = QtGui.QPainter()
             painter.begin(self)
             # set color and width of line drawing pen

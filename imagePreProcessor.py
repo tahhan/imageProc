@@ -3,62 +3,51 @@
 __author__="tahhan"
 __date__ ="$Jun 28, 2012 1:01:29 AM$"
 
-from PyQt4 import QtGui, QtCore
+#PIL
+import Image, ImageQt
 
-import os, Image, random, math
+import math
+
+from numpy import zeros
 
 HISTOGRAM_THRESHOLD = 50
 
-class imagePreProcessor(QtGui.QWidget):
+class imagePreProcessor():
     def __init__(self):
-        super(imagePreProcessor, self).__init__()
         self.Qimg = None
+        self.img = None
+        #to use the threading here use Qthread with the following as an idea
+        #self.status = ''
+        #imagePreProcessor.__dict__[self.status](self)
+        #self.emit(SIGNAL("output(QImage)", self.Qimg))
 
     def loadImage(self, imgFile, isGray=1):
         self.img = Image.open(imgFile)
-
         if isGray:
             self.img = self.img.convert("L")
-            filename, self.ext = os.path.splitext(imgFile)
-            imgFile = '/tmp/' + str(random.random()) + self.ext
-            self.img.save(imgFile)
-
-        self.Qimg = QtGui.QImage(imgFile)
-        #remove tmp file
-        if isGray:
-            os.remove(imgFile)
-
+        #we have problem with converted imgae to gray, dont know why???
+        #i ga' it we cant import an image with one value ("L") and display it as ("RGB")
+        #so we have to make a copy, change the color space and then display it
+        self.Qimg = ImageQt.ImageQt(self.img.convert("RGB") if self.img.mode == "L" else self.img)
         self.findHistogram()
-        self.repaint()
 
     def loadImageFromPIX(self, img):
         self.img = img
-        imgFile = '/tmp/' + str(random.random()) + self.ext
-        self.img.save(imgFile)
-        self.Qimg = QtGui.QImage(imgFile)
-        os.remove(imgFile)
+        self.Qimg = ImageQt.ImageQt(self.img.convert("RGB") if self.img.mode == "L" else self.img)
         self.findHistogram()
-        self.repaint()
 
     def findHistogram(self):
         width, height = self.img.size
-
-        #pixeling : the only purpose of this it to reduce the over head of im.getpixel()
+        #pixeling : the only purpose of this it to reduce the over head of im.getpixel() and im.putpixel()
         self.pixels = self.img.load()
 
         #initialize histogram with zeros
-        self.histo = [0 for x in range(256)]
-
+        #self.histo = [0 for x in range(256)]
+        self.histo = zeros(256) #using numpy zeros
         #now fill it
         for i in range(width):
             for j in range(height):
                 self.histo[self.pixels[i,j]] = self.histo[self.pixels[i,j]]+1
-
-    def paintEvent(self, event):
-        painter = QtGui.QPainter(self)
-        if self.Qimg :
-            painter.drawImage(event.rect(), self.Qimg, event.rect())
-        painter.end()
 
     def minGrayLevel(self):
         min = 0
@@ -90,7 +79,7 @@ class imagePreProcessor(QtGui.QWidget):
         width, height = self.img.size
         for i in range(width):
             for j in range(height):
-                self.img.putpixel((i, j), ( (maxR - minR)/float(max - min) )* (self.pixels[i,j] - min) )
+                self.pixels[i,j] = ( (maxR - minR)/float(max - min) )* (self.pixels[i,j] - min)
 
         self.loadImageFromPIX(self.img)
 
@@ -98,7 +87,7 @@ class imagePreProcessor(QtGui.QWidget):
         width, height = self.img.size
         for i in range(width):
             for j in range(height):
-                self.img.putpixel( (i, j), self.pixels[i,j] - amount )
+                self.pixels[i,j] = self.pixels[i,j] - amount
 
         self.loadImageFromPIX(self.img)
 
@@ -106,16 +95,16 @@ class imagePreProcessor(QtGui.QWidget):
         width, height = self.img.size
         for i in range(width):
             for j in range(height):
-                self.img.putpixel( (i, j), self.pixels[i,j] + amount )
+                self.pixels[i,j] = self.pixels[i,j] + amount
 
         self.loadImageFromPIX(self.img)
 
     def histogramEqualization(self):
         runningSum = []
-        dummyNumber = 0
+        accumulator = 0
         for i in range(0, 255):
-            dummyNumber += self.histo[i]
-            runningSum.append(dummyNumber)
+            accumulator += self.histo[i]
+            runningSum.append(accumulator)
 
         totalNumber = runningSum[-1]
         maxGrayLevel = self.maxGrayLevel()
@@ -125,7 +114,7 @@ class imagePreProcessor(QtGui.QWidget):
         width, height = self.img.size
         for i in range(width):
             for j in range(height):
-                self.img.putpixel((i, j), self.histo[ self.pixels[i,j] ]  )
+                self.pixels[i, j] = self.histo[ self.pixels[i,j] ]
 
         self.loadImageFromPIX(self.img)
 
@@ -133,7 +122,7 @@ class imagePreProcessor(QtGui.QWidget):
         width, height = self.img.size
         for i in range(width):
             for j in range(height):
-                self.img.putpixel((i, j), 255 - self.pixels[i,j]  )
+                self.pixels[i, j] = 255 - self.pixels[i,j]
 
         self.loadImageFromPIX(self.img)
 
@@ -152,7 +141,7 @@ class imagePreProcessor(QtGui.QWidget):
                 self.pixels[ (i+1), j ] +
                 self.pixels[ (i+1), j+1 ] ) / 9
 
-                self.img.putpixel( (i, j), result )
+                self.pixels[i, j] = result
 
         self.loadImageFromPIX(self.img)
 
@@ -177,12 +166,13 @@ class imagePreProcessor(QtGui.QWidget):
                 window[x] = window[min]
                 window[min] = temp
              #   Get result - the middle element
-             self.img.putpixel( ( (m-1) , n-1), window[4])
+             self.pixels[m-1, n-1] = window[4]
 
         self.loadImageFromPIX(self.img)
-
+        
     def edgeDetection(self):
         newImg = Image.new("L", self.img.size)
+        newImgPixels = newImg.load()
         width, height = self.img.size
         for i in range(1, width-1):
             for j in range(1, height-1):
@@ -201,8 +191,8 @@ class imagePreProcessor(QtGui.QWidget):
                 conv_y = (pixel_up_left+(pixel_up*2)+pixel_up_right)-(pixel_down_left+(pixel_down*2)+pixel_down_right)
 
                 # calculating the distance
-                #gray = math.sqrt( (conv_x*conv_x+conv_y+conv_y) )
+                #gray = math.sqrt( (conv_x*conv_x+conv_y+conv_y) ) #this take a lot of time
                 gray = math.fabs(conv_x)+math.fabs(conv_y);
-                newImg.putpixel((i,j), gray)
+                newImgPixels[i,j] = gray
 
         self.loadImageFromPIX(newImg)
