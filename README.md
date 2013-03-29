@@ -56,8 +56,13 @@ basically implementing most of [Image Processing Operator Worksheets](http://hom
 
 - PyQt 4.9.1
 
+- NumPy 1.7.0
+
 ###[SIP](http://www.riverbankcomputing.co.uk/software/sip/download/)
 > SIP is a tool that makes it very easy to create Python bindings for C and C++ libraries. It was originally developed to create PyQt, the Python bindings for the Qt toolkit, but can be used to create bindings for any C or C++ library.
 
 ###[PyQt](http://www.riverbankcomputing.co.uk/software/pyqt/download/)
 > PyQt is a set of Python bindings for Nokia's Qt application framework and runs on all platforms supported by Qt including Windows, MacOS/X and Linux.
+
+###[NumPy](http://www.scipy.org/Installing_SciPy/Linux)
+> NumPy is the fundamental package for scientific computing with Python.
