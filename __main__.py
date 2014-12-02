@@ -5,11 +5,16 @@ __date__ ="$Mar 16, 2012 12:56:40 AM$"
 
 from PyQt4 import QtGui
 import sys
-from gui import MainWindow
+from gui import Ui_MainWindow
 
 def main():
     app = QtGui.QApplication(sys.argv)
-    ui = MainWindow()
+    MainWindow = QtGui.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+
+    MainWindow.show()
+    
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

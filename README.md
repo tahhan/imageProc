@@ -66,3 +66,9 @@ basically implementing most of [Image Processing Operator Worksheets](http://hom
 
 ###[NumPy](http://www.scipy.org/Installing_SciPy/Linux)
 > NumPy is the fundamental package for scientific computing with Python.
+
+###Installation On MacOSX
+Use these guides:
+- [installing PyQT4](http://www.renedohmen.nl/blog/2011/11/installing-pyqt4-on-mac-osx/)
+
+- [installing Python Image Library (PIL)](https://rayed.com/wordpress/?p=1433)

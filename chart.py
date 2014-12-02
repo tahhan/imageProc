@@ -6,9 +6,9 @@ __date__ ="$Jun 28, 2012 12:55:48 AM$"
 from PyQt4 import QtGui, QtCore
 import math
 
-class chart(QtGui.QWidget):
-    def __init__(self, chartData=[]):
-        super(chart, self).__init__()
+class Chart(QtGui.QWidget):
+    def __init__(self, parent, chartData=[]):
+        super(Chart, self).__init__(parent)
         self.chartData = chartData
 
     def setData(self, chartData ):
@@ -23,12 +23,12 @@ class chart(QtGui.QWidget):
             painter.setPen(QtGui.QPen(QtCore.Qt.black, 2))
             # drawLine(x1, y1, x2, y2) from point (x1,y1) to (x2,y2)
             # draw the baseline
-            painter.drawLine(45, 160, 310, 160)
+            painter.drawLine(0, 160, 265, 160)
             # set up color and width of the bars
             width = 0.5
             painter.setPen(QtGui.QPen(QtCore.Qt.red, width))
             delta = width + 0.5
-            x = 50
+            x = 5
             for y in self.chartData:
                 # correct for width
                 y1 = 160 - width/2

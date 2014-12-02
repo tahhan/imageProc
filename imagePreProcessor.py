@@ -4,17 +4,14 @@ __author__="tahhan"
 __date__ ="$Jun 28, 2012 1:01:29 AM$"
 
 #PIL
-import Image, ImageQt
-
+from PIL import Image
 import math
-
 from numpy import zeros
 
 HISTOGRAM_THRESHOLD = 50
 
 class imagePreProcessor():
     def __init__(self):
-        self.Qimg = None
         self.img = None
         #to use the threading here use Qthread with the following as an idea
         #self.status = ''
@@ -28,12 +25,10 @@ class imagePreProcessor():
         #we have problem with converted imgae to gray, dont know why???
         #i ga' it we cant import an image with one value ("L") and display it as ("RGB")
         #so we have to make a copy, change the color space and then display it
-        self.Qimg = ImageQt.ImageQt(self.img.convert("RGB") if self.img.mode == "L" else self.img)
         self.findHistogram()
 
     def loadImageFromPIX(self, img):
         self.img = img
-        self.Qimg = ImageQt.ImageQt(self.img.convert("RGB") if self.img.mode == "L" else self.img)
         self.findHistogram()
 
     def findHistogram(self):
